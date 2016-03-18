@@ -17,57 +17,62 @@ NOTES: If there are no common words return NULL.
 
 #define SIZE 31
 
-char ** commonWords(char *str1, char *str2) {
-	if (str1==NULL||str2==NULL)
-	return NULL;
-	char tok_str1[100][100];
-	int words_count_1, words_count_2;
-	int i = 0;
-	char **output = (char**)malloc(100 * sizeof(char *));
-	int k = 0;
-	char tok_str2[100][100];
-	for (int j = 0; str1[j] != '\0'; j++){
-		if (str1[j] != ' ')
-			tok_str1[i][k++] = str1[j];
-		else{
-			i++;
-			k = 0;
+
+int exists(char *s1, int beginning, int end, char *s2, int wordLength)
+{
+	int index, count = 0, temp = beginning;
+	for (index = 0; s2[index] != '\0'; index++)
+	{
+		if (s2[index] == ' ')
+		{
+			count = 0;
+			temp = beginning;
+			continue;
 		}
-	}
-	tok_str1[i][k++] = '\0';
-	words_count_1 = i > 0 ? i + 1 : i;
-	i = 0; k = 0;
-
-	for (int j = 0; str2[j] != '\0'; j++){
-		if (str2[j] != ' ')
-			tok_str2[i][k++] = str2[j];
-		else{
-			i++;
-			k = 0;
+		if (s1[temp] == s2[index])
+		{
+			count++;
+			temp++;
 		}
+		if (count == wordLength)
+			return(1);
 	}
-	tok_str2[i][k++] = '\0';
-	words_count_2 = i > 0 ? i + 1 : i;
+	return(0);
+}
 
-
-	int t = 0;
-	for (i = 0; i <= words_count_1; i++){
-
-		for (int j = 0; j <= words_count_2; j++){
-			if (tok_str1[i] == tok_str2[j]){
-				output[t] = (char*)malloc(100 * sizeof(char));
-
-				output[t++] = tok_str1[i];
+char ** commonWords(char *str1, char *str2)
+{
+	if (str1 == '\0' || str2 == '\0')
+		return(NULL);
+	int index, k = 0, count = 1, index1, resindex = 0, j = 0, flag = 0;
+	char **result = (char **)malloc(SIZE * sizeof(int *));
+	for (index = 0; index < SIZE; index++)
+		result[index] = (char *)malloc(SIZE * sizeof(char));
+	for (index = 0; str1[index] != '\0'; index++)
+	{
+		if (str1[index] == ' ')
+		{
+			k = index + 1;
+			count = 1;
+			continue;
+		}
+		if (str1[index + 1] == ' ' || str1[index + 1] == '\0')
+		{
+			if (exists(str1, k, index, str2, count))
+			{
+				flag = 1;
+				for (index1 = k; index1 <= index; index1++)
+				{
+					result[resindex][j++] = str1[index1];
+				}
+				result[resindex][j] = '\0';
+				resindex++;
+				j = 0;
 			}
-
 		}
+		count++;
 	}
-	output[t] = '\0';
-
-
-	if (t== 0)
-		return NULL;
-	else
-		return output;
-
+	if (!flag)
+		return(NULL);
+	return(result);
 }
